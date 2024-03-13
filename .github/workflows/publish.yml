@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: show file list
+        run: ls
+
       - name: Publish Electron app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
