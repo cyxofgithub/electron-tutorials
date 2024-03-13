@@ -18,18 +18,19 @@ jobs:
         with:
           node-version: 16.17.0
     
-      - name: cd Demo
-        run: cd Demo
-      
-      - name: show file list
-        run: ls
+      - name: Change directory to Demo
+        run: |
+          cd Demo
+          ls -la
 
       - name: Install dependencies
-        run: yarn install
-
-  
+        run: |
+          cd Demo
+          yarn install
 
       - name: Publish Electron app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: yarn publish
+        run: |
+          cd Demo
+          yarn publish
