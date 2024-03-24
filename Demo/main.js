@@ -1,43 +1,48 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
-const path = require("node:path");
+const { app, BrowserWindow, Menu, ipcMain } = require('electron/main')
+const path = require('node:path')
 
-async function handleFileOpen () {
-    const { canceled, filePaths } = await dialog.showOpenDialog({})
-    if (!canceled) {
-      return filePaths[0]
+function createWindow () {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
     }
-}
+  })
 
-function handleSetTitle(event, title) {
-    const webContents = event.sender;
-    const win = BrowserWindow.fromWebContents(webContents);
-    win.setTitle(title);
-}
-
-const createWindow = () => {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
+  const menu = Menu.buildFromTemplate([
+    {
+      label: app.name,
+      submenu: [
+        {
+          click: () => mainWindow.webContents.send('update-counter', 1),
+          label: 'Increment'
         },
-    });
+        {
+          click: () => mainWindow.webContents.send('update-counter', -1),
+          label: 'Decrement'
+        }
+      ]
+    }
 
-    win.loadFile("index.html");
-};
+  ])
 
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit();
-});
+  Menu.setApplicationMenu(menu)
+  mainWindow.loadFile('index.html')
+
+  // Open the DevTools.
+  mainWindow.webContents.openDevTools()
+}
 
 app.whenReady().then(() => {
-    ipcMain.handle('dialog:openFile', handleFileOpen);
-    ipcMain.on("set-title", handleSetTitle);
+  ipcMain.on('counter-value', (_event, value) => {
+    console.log(value) // will print value to Node console
+  })
+  createWindow()
 
-    createWindow();
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
 
-    app.on("activate", () => {
-        console.log("activate");
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
-});
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
