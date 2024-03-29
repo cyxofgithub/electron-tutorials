@@ -18,3 +18,7 @@
 [进程通信](./Doc/Electron进程/进程间通信.md)
 [进程沙箱](./Doc/Electron进程/进程沙箱.md)
 [消息端口](./Doc/Electron进程/消息端口.md)
+
+## Electron 最佳实践
+
+[性能](./Doc/Electron最佳实践/性能.md)
